@@ -1,0 +1,6 @@
+- Tem b negativo?
+	se sim -> Dual (ou tem solução ou inviável (b negativo mas a todo positivo ou 0, sem a negativo pra escolher). Tenta achar a solução da dual ou ver que é inviável e resolver com PL auxiliar 
+	se não -> Primal (se o b for todo positivo). Acha a solução ótima ou ver que é ilimitada (c negativo e coluna do A toda negativa ou 0).
+
+PL auxiliar (b tem que estar todo positivo): achou que é inviável pela dual  OU c todo positivo e b todo positivo. Se o ótimo deu 0: pegar esse tableau e tirar a parte de cima e colocar o c negado. 
+
