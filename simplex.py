@@ -15,7 +15,9 @@ def read_file():
 	lp.matrix = np.array([[1, 2, 3, 0], [1, 1, 1, 2], [0, -1, 3, 9]])
 	return lp
 
-def fpi(lpInput):
+# Transforma a matriz da entrada no tableaux inicial
+def build_tableaux(lpInput):
+	# 1 - Coloca a PL em FPI
 	#Exapande a matriz com zeros
 	for i in range(0, lpInput.lines-1):
 		lpInput.matrix = np.insert(lpInput.matrix,lpInput.columns-1,0,axis=1)
@@ -28,10 +30,14 @@ def fpi(lpInput):
 		id_index_i += 1
 		id_index_j += 1
 
+	#2 - Multiplica o vetor c por -1
+	for i in range(0, lpInput.columns-1):
+		lpInput.matrix[0][i] = lpInput.matrix[0][i]*(-1)
+
 def main():
 	lp = read_file()
 	print lp.matrix
-	fpi(lp)
+	build_tableaux(lp)
 	print lp.matrix
 
 if __name__ == "__main__":
