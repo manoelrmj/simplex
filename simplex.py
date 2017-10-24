@@ -18,6 +18,31 @@ def read_file():
 	lp.matrix = lp.matrix.astype(float)
 	return lp
 
+def get_solution(lp):
+	bases_columns = []
+	index_bases = []
+	solution_array = []
+	for i in range(0, lp.columns-1):
+		#verifica coluna
+		is_base = True
+		for j in range(1, lp.lines):
+			if (lp.matrix[j][i] != 0 and lp.matrix[j][i] != 1):
+				is_base = False
+		if is_base == True: 
+			bases_columns.append(i)
+	for i in range(0, lp.columns-1):
+		if(i in bases_columns):
+			for j in range(1, lp.lines):
+				if lp.matrix[j][i] == 1:
+					solution_array.append(lp.matrix[j][lp.columns-1])
+		else:
+			solution_array.append(0)
+	lp_solution = []
+	for i in range(0, lp.lines):
+		lp_solution.append(solution_array[i])
+	#print lp_solution
+	return lp_solution
+
 # Transforma a matriz da entrada no tableaux inicial
 def build_tableaux(lpInput):
 	# 1 - Coloca a PL em FPI
@@ -52,9 +77,9 @@ def build_tableaux(lpInput):
 	#print lpInput.operations_matrix
 
 def primal_pivoting(pl):
+	print pl.operations_matrix
 	print pl.matrix
 	while True: #Executar até não haver mais entrada negativa no c
-		print "\n--"
 		# Escolher coluna:
 		column_index = None
 		for i in range(0, pl.columns-1):
@@ -62,7 +87,11 @@ def primal_pivoting(pl):
 				column_index = i
 				break
 		if column_index == None: # Não existem mais elementos negativos no c
-			print "Ótimo: {}".format(pl.matrix[0][pl.columns-1])
+			certificate = []
+			for i in range(0, pl.lines-1):
+				certificate.append(pl.operations_matrix[0][i])
+			print "Solução ótima x = {}, com valor objetivo {} e certificado y={}".format(get_solution(pl), pl.matrix[0][pl.columns-1], certificate)
+			get_solution(pl)
 			return
 		else: # Verifica os valores de A na coluna correspondente para checar se é ilimitada
 			positive_a = False
@@ -105,10 +134,8 @@ def primal_pivoting(pl):
 					pl.operations_matrix[i][k] = pl.operations_matrix[i][k] + pl.operations_matrix[pivot_index[0]][k]*coefficient
 		print pl.operations_matrix
 		print pl.matrix
-		print "--"
 
 def dual_pivoting(pl):
-	print "DUAL PIVONTING MODE ENTERED"
 	print pl.operations_matrix
 	print pl.matrix
 	while True: #Executar até não haver mais entrada negativa no c
@@ -120,7 +147,10 @@ def dual_pivoting(pl):
 					line_index = i
 					break
 		if line_index == None: # Não existem mais elementos negativos no c
-			print "Ótimo: {}".format(pl.matrix[0][pl.columns-1])
+			certificate = []
+			for i in range(0, pl.lines-1):
+				certificate.append(pl.operations_matrix[0][i])
+			print "Solução ótima x = {}, com valor objetivo {} e certificado y={}".format(get_solution(pl), pl.matrix[0][pl.columns-1], certificate)
 			return
 		else: # Verifica se existem valores negativos em A
 			negative_a = False
@@ -142,13 +172,13 @@ def dual_pivoting(pl):
 		for i in range(0, pl.columns-1):
 			if not (pl.matrix[line_index][i] >= 0): # A deve ser negativo
 				ratio = pl.matrix[line_index][pl.columns-1]/(pl.matrix[line_index][i]*-1)
-				print "{}/{}".format(pl.matrix[line_index][pl.columns-1],pl.matrix[line_index][i])
+				#print "{}/{}".format(pl.matrix[line_index][pl.columns-1],pl.matrix[line_index][i])
 				if ratio < min_ratio or min_ratio == None:
 					min_ratio = ratio
 					pivot_index = (line_index, i)
 					pivot_value = pl.matrix[line_index][i]
-		print pivot_value
-		print "[{}][{}]".format(pivot_index[0], pivot_index[1])
+		#print pivot_value
+		#print "[{}][{}]".format(pivot_index[0], pivot_index[1])
 		# Transformar o pivot em 1 (e sua linha correspondente)
 		if pivot_value != 1:
 			for i in range(0, pl.columns):
@@ -168,7 +198,6 @@ def dual_pivoting(pl):
 					pl.operations_matrix[i][k] = pl.operations_matrix[i][k] + pl.operations_matrix[pivot_index[0]][k]*coefficient
 		print pl.operations_matrix
 		print pl.matrix
-
 
 def auxiliar_lp():
 	return 0
