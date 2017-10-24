@@ -77,8 +77,10 @@ def build_tableaux(lpInput):
 	#print lpInput.operations_matrix
 
 def primal_pivoting(pl):
-	print pl.operations_matrix
-	print pl.matrix
+	#print pl.operations_matrix
+	#print pl.matrix
+	tableaux = np.concatenate((pl.operations_matrix, pl.matrix), axis=1)
+	print tableaux
 	while True: #Executar até não haver mais entrada negativa no c
 		# Escolher coluna:
 		column_index = None
@@ -132,12 +134,16 @@ def primal_pivoting(pl):
 				# Atualiza matrix de operações
 				for k in range(0, pl.operations_matrix.shape[1]):
 					pl.operations_matrix[i][k] = pl.operations_matrix[i][k] + pl.operations_matrix[pivot_index[0]][k]*coefficient
-		print pl.operations_matrix
-		print pl.matrix
+		#print pl.operations_matrix
+		#print pl.matrix
+		tableaux = np.concatenate((pl.operations_matrix, pl.matrix), axis=1)
+		print tableaux
 
 def dual_pivoting(pl):
-	print pl.operations_matrix
-	print pl.matrix
+	#print pl.operations_matrix
+	#print pl.matrix
+	tableaux = np.concatenate((pl.operations_matrix, pl.matrix), axis=1)
+	print tableaux
 	while True: #Executar até não haver mais entrada negativa no c
 		#Escolher linha
 		line_index = None
@@ -196,8 +202,10 @@ def dual_pivoting(pl):
 				# Atualiza matrix de operações
 				for k in range(0, pl.operations_matrix.shape[1]):
 					pl.operations_matrix[i][k] = pl.operations_matrix[i][k] + pl.operations_matrix[pivot_index[0]][k]*coefficient
-		print pl.operations_matrix
-		print pl.matrix
+		#print pl.operations_matrix
+		#print pl.matrix
+		tableaux = np.concatenate((pl.operations_matrix, pl.matrix), axis=1)
+		print tableaux
 
 def auxiliar_lp():
 	return 0
