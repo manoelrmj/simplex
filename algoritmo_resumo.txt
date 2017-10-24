@@ -5,4 +5,5 @@
 PL auxiliar (b tem que estar todo positivo): achou que é inviável pela dual  OU c todo positivo e b todo positivo. Se o ótimo deu 0: pegar esse tableau e tirar a parte de cima e colocar o c negado. 
 
 
-PL Auxiliar: crias as variáveis de folga, depois as variáveis da PL auxiliar. O c fica zerado menos onde tem as variáveis da PL auxiliar (onde fica 1's) e depois o zero encima do b. Zerar os 1's das variáveis da pl auxiliar, fazendo o resto do c mudar. Se ótimo é negativo, é INVIÁVEL (certificado na matriz de operações). Se for 0, é VIÁVEL (Tirar as colunas da variável da PL auxiliar. Colocar o c inicial negado).
+PL Auxiliar: crias as variáveis de folga, depois as variáveis da PL auxiliar. O c fica zerado menos onde tem as variáveis da PL auxiliar (onde fica 1's) e depois o zero encima do b. 
+Zerar os 1's das variáveis da pl auxiliar, fazendo o resto do c mudar. Se ótimo é negativo, é INVIÁVEL (certificado na matriz de operações). Se for 0, é VIÁVEL (Tirar as colunas da variável da PL auxiliar. Colocar o c inicial negado).

@@ -207,9 +207,31 @@ def dual_pivoting(pl):
 		tableaux = np.concatenate((pl.operations_matrix, pl.matrix), axis=1)
 		print tableaux
 
-def auxiliar_lp():
-	return 0
+def auxiliar_lp(lp):
+	#Zera entradas do vetor c
+	for i in range(0, lp.lines-1):
+		lp.matrix[0][i] = 0
 
+	# Gera colunas da pl auxiliar
+	#Exapande a matriz com zeros e adiciona 1's na diagonal principal e no c
+	main_diagonal_indexes = []
+	for i in range(0, lp.lines-1):
+		lp.matrix = np.insert(lp.matrix,lp.columns-1,0,axis=1)
+		main_diagonal_indexes.append((i+1,lp.columns-1))
+		lp.columns += 1		
+	for index in main_diagonal_indexes:
+		lp.matrix[index[0]][index[1]] = 1
+		lp.matrix[0][index[1]] = 1
+
+	print lp.operations_matrix
+	print lp.matrix
+	
+	for i in range(1, lp.lines):
+		for j in range(0, lp.columns):
+			lp.matrix[0][j] += lp.matrix[i][j]*(-1)
+	print lp.matrix
+	
+	
 def main():
 	lp = read_file()
 	#print lp.matrix
@@ -219,9 +241,11 @@ def main():
 		if lp.matrix[i][lp.columns-1] < 0: # Entrada negativa no vetor B -> PL Dual
 			bool_dual = True
 	if bool_dual:
-		dual_pivoting(lp)
+		#dual_pivoting(lp)
+		auxiliar_lp(lp)
 	else:
-		primal_pivoting(lp)
+		auxiliar_lp(lp)
+		#primal_pivoting(lp)
 
 if __name__ == "__main__":
 	main()
