@@ -76,7 +76,7 @@ def build_tableaux(lpInput):
 		id_index_j += 1	
 	#print lpInput.operations_matrix
 
-def primal_pivoting(pl):
+def primal_pivoting(pl, output=True):
 	#print pl.operations_matrix
 	#print pl.matrix
 	tableaux = np.concatenate((pl.operations_matrix, pl.matrix), axis=1)
@@ -92,17 +92,38 @@ def primal_pivoting(pl):
 			certificate = []
 			for i in range(0, pl.lines-1):
 				certificate.append(pl.operations_matrix[0][i])
-			print "Solução ótima x = {}, com valor objetivo {} e certificado y={}".format(get_solution(pl), pl.matrix[0][pl.columns-1], certificate)
-			get_solution(pl)
-			return
+			if output == True:
+				print "Solução ótima x = {}, com valor objetivo {} e certificado y={}".format(get_solution(pl), pl.matrix[0][pl.columns-1], certificate)
+			#get_solution(pl)
+			return pl
 		else: # Verifica os valores de A na coluna correspondente para checar se é ilimitada
 			positive_a = False
 			for i in range(1, pl.lines):
 				if pl.matrix[i][column_index] > 0:
 					positive_a = True
 			if positive_a == False:
-				print "PL ilimitada"
-				return
+				#PL ilimitada
+				#Calcular os valores do certificado
+				d_certificate = []
+				for i in range(0, pl.columns-1):
+					if i == column_index:
+						d_certificate.append(1)
+					else:
+						#Checar se a coluna faz parte da base
+						is_base = True
+						for j in range(1, pl.lines):
+							if pl.matrix[j][i] != 0 and pl.matrix[j][i] != 1:
+								is_base = False
+						if is_base == True:
+							for j in range(1, pl.lines):
+								if pl.matrix[j][i] == 1:
+									d_certificate.append(pl.matrix[j][column_index]*(-1))
+									break
+						else:
+							d_certificate.append(0)
+				if output == True:
+					print "PL ilimitada, aqui esta um certificado {}".format(d_certificate)
+				return pl
 		#print "Coluna: {}".format(column_index)
 		# Calcula a razão entre os elementos de 'b' e 'a' e escolhe o menor:
 		min_ratio = None
@@ -138,6 +159,7 @@ def primal_pivoting(pl):
 		#print pl.matrix
 		tableaux = np.concatenate((pl.operations_matrix, pl.matrix), axis=1)
 		print tableaux
+	return pl
 
 def dual_pivoting(pl):
 	#print pl.operations_matrix
@@ -208,8 +230,14 @@ def dual_pivoting(pl):
 		print tableaux
 
 def auxiliar_lp(lp):
+	#Salva o vetor c original
+	original_c = []
+	for i in range(0, lp.columns-1):
+		original_c.append(lp.matrix[0][i])
+	print "original_c: {}".format(original_c)
+
 	#Zera entradas do vetor c
-	for i in range(0, lp.lines-1):
+	for i in range(0, lp.columns-1):
 		lp.matrix[0][i] = 0
 
 	# Gera colunas da pl auxiliar
@@ -229,21 +257,56 @@ def auxiliar_lp(lp):
 	for i in range(1, lp.lines):
 		for j in range(0, lp.columns):
 			lp.matrix[0][j] += lp.matrix[i][j]*(-1)
-	print lp.matrix
+		for j in range(0, lp.operations_matrix.shape[1]):
+			lp.operations_matrix[0][j] += lp.operations_matrix[i][j]*(-1)
 	
+	#Cria um novo objeto lpInput com o novo tableau para enviar ao simplex
+	print "\n"
+	new_lp = lpInput()
+	new_lp.lines = lp.lines
+	new_lp.columns = lp.columns
+	new_lp.matrix = lp.matrix.copy()
+	new_lp.operations_matrix = lp.operations_matrix.copy()
+	print new_lp.operations_matrix
+	print new_lp.matrix
+	print "Primal called:"
+	new_lp = primal_pivoting(new_lp, False)
+	print "AUX TABLEAU: "
+	print new_lp.operations_matrix
+	print new_lp.matrix
+	if new_lp.matrix[0][new_lp.columns-1] == 0:
+		# Solução viável, refazer simplex
+		# 1) Remover colunas da pl auxiliar
+		print "Colunas a serem removidas: "
+		for i in range(new_lp.columns-2, new_lp.columns-new_lp.lines-1, -1):
+			print i
+			new_lp.matrix = np.delete(new_lp.matrix, i, 1)
+		print new_lp.operations_matrix
+		print new_lp.matrix
+		print "C recolocado: "
+		# 2) Recolocar o c original
+		for i in range(0, len(original_c)):
+			new_lp.matrix[0][i] = original_c[i]
+		print new_lp.operations_matrix
+		print new_lp.matrix
+	elif new_lp.matrix[0][new_lp.columns-1] < 0:
+		inviability_certificate = []
+		print "PL inviável, aqui esta um certificado: {}".format(inviability_certificate)
 	
 def main():
 	lp = read_file()
-	#print lp.matrix
+	print lp.matrix
 	build_tableaux(lp)
 	bool_dual = False
 	for i in range(1, lp.lines):
 		if lp.matrix[i][lp.columns-1] < 0: # Entrada negativa no vetor B -> PL Dual
 			bool_dual = True
 	if bool_dual:
-		#dual_pivoting(lp)
-		auxiliar_lp(lp)
+		print "DUAL"
+		dual_pivoting(lp)
+		#auxiliar_lp(lp)
 	else:
+		print "PRIMAL"
 		auxiliar_lp(lp)
 		#primal_pivoting(lp)
 
